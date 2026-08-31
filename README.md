@@ -38,3 +38,5 @@ Real commitments contain semantic requirements that cannot be reduced to keyword
 npm install; genvm-lint contracts/covenant_loom.py; python -m pytest -q; npm run build.
 
 The private key is never committed.
+
+Live app: https://covenant-loom-genlayer.pages.dev
