@@ -1,0 +1,81 @@
+{
+  "address": "0x07F1D460C7356dCB2f6A9849E922aF8Ede1898A0",
+  "owner": "0x1F5c15Fb865693a7c9F6758f920AED6E14089F0F",
+  "challenger": "0x00148e085f5AB15A847bF4D31d3ea9f8062E6c70",
+  "events": [
+    {
+      "functionName": "create_covenant",
+      "hash": "0xb270a1b5d190581b1e131d167eb525ad76bab99f3644cc426d19b0b868f53696"
+    },
+    {
+      "functionName": "open_checkpoint",
+      "hash": "0x4e95a892f013131ca0c3febffefc390c51bba5568f9e54c84ecb07309551e46c"
+    },
+    {
+      "functionName": "submit_fulfillment",
+      "hash": "0x119645888f46dd9d6bff4a3873093be84517195b39cce61266f17f1f861c1e30"
+    },
+    {
+      "functionName": "challenge_fulfillment",
+      "hash": "0xc21dffa2bca4db6f45c0089ac9f31761352853573f9f5b1c6f115a549d20a881"
+    }
+  ],
+  "record": {
+    "checks": [
+      "SUPPORTED"
+    ],
+    "covenant_id": "CHALLENGE-COV",
+    "covenant_version": 1,
+    "deliverable": "Review the delivery package using the attached report.",
+    "evidence": "Report excerpt: file count = 2. The two entries are alpha.md and beta.md.",
+    "history": [
+      {
+        "author": "0x1f5c15fb865693a7c9f6758f920aed6e14089f0f",
+        "packet": {
+          "deliverable": "Review the delivery package using the attached report.",
+          "evidence": "Report excerpt: file count = 2. The two entries are alpha.md and beta.md.",
+          "obligations": [
+            "The delivery report must include an explicit file count of two."
+          ],
+          "report": "The delivery report explicitly states that the file count is two."
+        },
+        "result": {
+          "checks": [
+            "SUPPORTED"
+          ],
+          "reason": "Text-only assessment: obligation 1 = SUPPORTED. No independent verification of delivery."
+        },
+        "round": 1
+      },
+      {
+        "author": "0x00148e085f5ab15a847bf4d31d3ea9f8062e6c70",
+        "packet": {
+          "counter_evidence": "The original report explicitly gives a file count of two, but the corrected manifest gives a file count of one and states beta.md was never delivered.",
+          "counter_evidence_author": "0x00148e085f5ab15a847bf4d31d3ea9f8062e6c70",
+          "deliverable": "Review the delivery package using the attached report.",
+          "evidence": "Report excerpt: file count = 2. The two entries are alpha.md and beta.md.",
+          "obligations": [
+            "The delivery report must include an explicit file count of two."
+          ],
+          "report": "The delivery report explicitly states that the file count is two."
+        },
+        "result": {
+          "checks": [
+            "SUPPORTED"
+          ],
+          "reason": "Text-only assessment: obligation 1 = SUPPORTED. No independent verification of delivery."
+        },
+        "round": 2
+      }
+    ],
+    "id": "CHALLENGE-CP",
+    "obligations": [
+      "The delivery report must include an explicit file count of two."
+    ],
+    "outcome": "SATISFIED",
+    "owner": "0x1f5c15fb865693a7c9f6758f920aed6e14089f0f",
+    "reason": "Text-only assessment: obligation 1 = SUPPORTED. No independent verification of delivery.",
+    "report": "The delivery report explicitly states that the file count is two.",
+    "status": "CHALLENGED"
+  }
+}

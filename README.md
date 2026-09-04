@@ -1,42 +1,35 @@
-# Covenant Loom
+# Covenant Loom — v2
 
-Consensus Obligation Compiler and Fulfillment Ledger.
+Covenant Loom preserves creator-owned, versioned obligations and evaluates supplied delivery text against an immutable checkpoint snapshot. It is not escrow, legal arbitration or independent proof that delivery happened.
 
-Covenant Loom turns natural-language commitments into versioned, reviewable fulfillment checkpoints. Claimants cannot supply or silently replace the rules used to judge them: the owner first anchors a canonical covenant, then every report is compared to that exact stored version.
+## Reviewer path
+1. Connect any Studionet wallet, not necessarily the deployer.
+2. Create a covenant with a unique ID, title and 1–8 obligations (one per line).
+3. Open a checkpoint with its own ID and deliverable. This freezes the covenant version and obligations.
+4. Enter the report and supporting text; select the checkpoint and submit.
+5. Wait for finalization and read back the actual report, evidence, indexed findings and assessment history.
+6. A different wallet can look up the creator address/checkpoint ID and challenge once with counter-evidence before finalization.
+7. The creator may finalize an evaluated/challenged checkpoint, or cancel an open one.
 
-## Why GenLayer is essential
+Revising a covenant never alters an existing checkpoint. Original reports and first-round assessments remain in challenge history. Submissions, challenges and finalizations cannot be replayed. All IDs are scoped to their creator.
 
-Real commitments contain semantic requirements that cannot be reduced to keyword checks. The Intelligent Contract uses gl.eq_principle.prompt_comparative to identify which material obligations are met, which are missing, and whether the result is SATISFIED, PARTIAL, or BREACH. Challenges trigger a second bounded round; the owner explicitly finalizes the checkpoint. No external URL or oracle is required.
+## Consensus
+Each validator independently evaluates every canonical obligation in order. Indexed SUPPORTED/MISSING/CONTRADICTED findings must agree. Stored explanations and SATISFIED/PARTIAL/INSUFFICIENT/BREACH are derived deterministically from those findings. Model-authored prose is discarded, so it cannot add unvalidated claims of external verification.
 
-## Complete repository
+## Limits
+Evidence is caller-supplied text, not authenticated external evidence. There is no enforced challenge delay: the creator can finalize before someone challenges. No funds, signatures certifying delivery or binding legal decision are implemented. All submitted text is public. Do not describe SATISFIED as independently proven real-world completion.
 
-- contracts/covenant_loom.py — complete deployed Intelligent Contract source
-- app/page.tsx — wallet-connected working surface
-- tests/test_contract.py — source, method, and canonical-terms tests
-- scripts/deploy.mjs — reproducible Studionet deployment
-- scripts/verify.mjs — real covenant, checkpoint, evaluation, and receipt read-back
+## Source and verification
 
-## Workflow and method map
+- Complete contract: contracts/covenant_loom.py
+- Direct adversarial tests: tests/test_contract.py (mock nondeterministic execution; not a real validator network)
+- Deployment script: scripts/deploy.mjs
+- Published source hash and address: artifacts/deployment.json
+- Real-network lifecycle check: scripts/verify-live.mjs (creates a fresh unrelated test wallet; saves public evidence only)
+- Frontend methods and exact argument forwarding: app/page.tsx and lib/ledger.ts
 
-1. create_covenant anchors authoritative terms; revise_covenant creates a visible new version.
-2. open_checkpoint binds a deliverable to that stored covenant.
-3. submit_fulfillment evaluates only against the canonical version.
-4. challenge_fulfillment permits one counter-evidence round.
-5. finalize_checkpoint closes the record; get_checkpoint returns the complete receipt.
+Run npm install, npx tsc --noEmit, npm run build, python -m pytest tests -q, and genvm-lint contracts/covenant_loom.py. Deployment requires GENLAYER_PRIVATE_KEY in the process environment; never commit it. Run node scripts/verify-live.mjs to test the current deployment. Local tests and source matching do not alone prove a complete production audit.
 
-## Studionet evidence
+## Hosting
 
-- Contract: https://explorer-studio.genlayer.com/address/0xa85E3bdDA9DBFD7446D079f17AE5c6dCe00b8171
-- Deployment: https://explorer-studio.genlayer.com/tx/0xa14c7dfedf803cdfb5394d5c7817692c04c477b27bfbfb25186256272bf67d53
-- Covenant: https://explorer-studio.genlayer.com/tx/0x90bb57fac46def75d01e1604cf7443be10f2979cbc507f34de932cbcb82bd421
-- Checkpoint: https://explorer-studio.genlayer.com/tx/0xee47ad4ee7888aa6710efe0041c6b3e448cc5384bf74ec78fbdd1dcb6c4e02cd
-- Verified consensus: https://explorer-studio.genlayer.com/tx/0x1dbc22a3487283f3a2aa31cf96b0ece31f78325b28c15763b3b9111cc5cb07ca
-- Result: SATISFIED, 98%, missing NONE
-
-## Verify
-
-npm install; genvm-lint contracts/covenant_loom.py; python -m pytest -q; npm run build.
-
-The private key is never committed.
-
-Live app: https://covenant-loom-genlayer.pages.dev
+[Public application](https://covenant-loom-genlayer.pages.dev). Cloudflare Pages proxies the built application hosted on Cloudflare Workers. No ChatGPT sign-in is required. The old v1 deployment is superseded, not migrated; its records are not part of this v2 workspace.

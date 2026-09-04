@@ -1,0 +1,64 @@
+{
+  "address": "0x07F1D460C7356dCB2f6A9849E922aF8Ede1898A0",
+  "reviewer": "0x8E4723ac141EBbf10Cd4994dC8d3E42977e7d978",
+  "events": [
+    {
+      "functionName": "create_covenant",
+      "hash": "0xe210456c4c4fdedb59dd2617583334687e58b74aaee5e1d1140dab29cd8b46ed"
+    },
+    {
+      "functionName": "open_checkpoint",
+      "hash": "0x89166d7117fd93d473f388c12c65c35f470390d829aeda261f25a3a1b8ab21b4"
+    },
+    {
+      "functionName": "revise_covenant",
+      "hash": "0x2c5e3f7f3eafc30e0587199899de52a98e555f10de773e43da660fdee1ab9fb9"
+    },
+    {
+      "functionName": "submit_fulfillment",
+      "hash": "0x800fc5271315e53c01ea1286e187d9808ba322373dd7f58020ac5b16afe77b04"
+    },
+    {
+      "functionName": "finalize_checkpoint",
+      "hash": "0x560ae21ee0923738526147fb4aa92994af78020f836944b6d6cddd52f70ee001"
+    }
+  ],
+  "assessed_record": {
+    "checks": [
+      "SUPPORTED"
+    ],
+    "covenant_id": "SMOKE-COV",
+    "covenant_version": 1,
+    "deliverable": "Assess the supplied release documentation report.",
+    "evidence": "Delivery manifest excerpt: release.md contains release notes; changes.md contains the detailed change log.",
+    "history": [
+      {
+        "author": "0x8e4723ac141ebbf10cd4994dc8d3e42977e7d978",
+        "packet": {
+          "deliverable": "Assess the supplied release documentation report.",
+          "evidence": "Delivery manifest excerpt: release.md contains release notes; changes.md contains the detailed change log.",
+          "obligations": [
+            "The report must list the names of two delivered files."
+          ],
+          "report": "The delivered package contains the following two files: release.md and changes.md."
+        },
+        "result": {
+          "checks": [
+            "SUPPORTED"
+          ],
+          "reason": "Text-only assessment: obligation 1 = SUPPORTED. No independent verification of delivery."
+        },
+        "round": 1
+      }
+    ],
+    "id": "SMOKE-CP",
+    "obligations": [
+      "The report must list the names of two delivered files."
+    ],
+    "outcome": "SATISFIED",
+    "owner": "0x8e4723ac141ebbf10cd4994dc8d3e42977e7d978",
+    "reason": "Text-only assessment: obligation 1 = SUPPORTED. No independent verification of delivery.",
+    "report": "The delivered package contains the following two files: release.md and changes.md.",
+    "status": "EVALUATED"
+  }
+}

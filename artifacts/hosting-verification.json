@@ -1,0 +1,47 @@
+{
+  "url": "https://covenant-loom-genlayer.pages.dev/",
+  "status": 200,
+  "assets": [
+    {
+      "path": "/_next/static/css/index.BO9AwkKB.css",
+      "status": 200,
+      "type": "text/css"
+    },
+    {
+      "path": "/_next/static/chunks/index-B6OigGGH.js",
+      "status": 200,
+      "type": "text/javascript"
+    },
+    {
+      "path": "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
+      "status": 200,
+      "type": "text/javascript"
+    },
+    {
+      "path": "/_next/static/chunks/framework-D_rUT4EX.js",
+      "status": 200,
+      "type": "text/javascript"
+    },
+    {
+      "path": "/_next/static/chunks/layout-segment-context-yM2LTYlX.js",
+      "status": 200,
+      "type": "text/javascript"
+    },
+    {
+      "path": "/_next/static/chunks/page-BvNWV69N.js",
+      "status": 200,
+      "type": "text/javascript"
+    },
+    {
+      "path": "/_next/static/chunks/utils-CME0TaWh.js",
+      "status": 200,
+      "type": "text/javascript"
+    },
+    {
+      "path": "/_next/static/chunks/localBatchGatewayRequest-DGSF7juL.js",
+      "status": 200,
+      "type": "text/javascript"
+    }
+  ],
+  "checked_at": "2026-09-04T17:01:04.980Z"
+}
