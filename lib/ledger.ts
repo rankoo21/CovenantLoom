@@ -92,7 +92,7 @@ export function useLedger(address: string) {
       const tx: any = await reader.getTransaction({ hash: h });
       const leaders = tx.consensus_data?.leader_receipt;
       const execution = Array.isArray(leaders)
-        ? leaders[leaders.length - 1]
+        ? leaders.find((receipt: any) => receipt.mode === "leader") || leaders[0]
         : leaders;
       if (
         tx.result_name !== 'MAJORITY_AGREE' ||
