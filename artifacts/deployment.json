@@ -3,5 +3,6 @@
   "transaction": "0xc03240508e1feb94bdc126911779d515554105048badba6b21c1428bb2d2b423",
   "source_sha256": "901041dbc7015ee01f896618b2b6fb142a39e148221aeb23ee1414ee127ca22a",
   "network": "studionet",
+  "source_commit": "296ebb7",
   "source_verified": true
 }
