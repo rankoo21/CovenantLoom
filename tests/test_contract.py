@@ -1,101 +1,47 @@
-import json
-import pytest
-from harness import load_contract, agree, UserError
-TERMS = "Include a detailed threat model in the report.\nList every critical finding and its mitigation."
-REPORT = "The supplied report has a threat model identifying input injection and data leakage."
-EVIDENCE = "Section 1 describes the threat model; section 2 maps critical findings to mitigations."
-GOOD = {"checks": ["SUPPORTED", "SUPPORTED"], "reason": "Both indexed obligations are explicitly addressed by the supplied text."}
-
+import hashlib,json,pytest
+from harness import load_contract,agree,web_agree,UserError
+TERMS="Publish a detailed threat model with named attack surfaces.\nMap every critical finding to a concrete mitigation."
+URL="https://evidence.example/report-v1.txt"
+BODY="Threat model: prompt injection and data exfiltration. Critical findings map to input isolation and output filtering mitigations."
+GOOD={"checks":["SUPPORTED","SUPPORTED"]}
 @pytest.fixture
-def env():
-    return load_contract("covenant_loom.py", "CovenantLoom")
-
-def opened(env):
-    c = env[1]
-    c.create_covenant("COV-001", "Safety review", TERMS)
-    c.open_checkpoint("CP-001", "COV-001", "Review the supplied safety report text.")
-    return c
-
-def evaluated(env):
-    c = opened(env)
-    agree(env[3], GOOD)
-    c.submit_fulfillment("CP-001", REPORT, EVIDENCE)
-    return c
-
-def test_non_deployer_full_path(env):
-    env[2].message.sender_address = "0xvisitor"
-    c = evaluated(env)
-    c.finalize_checkpoint("CP-001")
-    r = json.loads(c.get_checkpoint("0xvisitor", "CP-001"))
-    assert r["status"] == "FINAL" and r["report"] == REPORT and r["evidence"] == EVIDENCE
-    assert len(r["history"]) == 1
-
-def test_snapshot_survives_revision(env):
-    c = opened(env)
-    c.revise_covenant("COV-001", "A completely new obligation requiring independent signed approval.")
-    agree(env[3], GOOD)
-    c.submit_fulfillment("CP-001", REPORT, EVIDENCE)
-    r = json.loads(c.get_checkpoint("0xowner", "CP-001"))
-    assert r["covenant_version"] == 1 and r["obligations"] == TERMS.splitlines()
-    assert "completely new" not in env[4][0]
-
-def test_unrelated_wallet_cannot_mutate(env):
-    c = opened(env)
-    env[2].message.sender_address = "0xother"
-    with pytest.raises(UserError): c.revise_covenant("COV-001", TERMS)
-    with pytest.raises(UserError): c.submit_fulfillment("CP-001", REPORT, EVIDENCE)
-    with pytest.raises(UserError): c.cancel_checkpoint("CP-001")
-    c.create_covenant("COV-001", "Other safety", TERMS)
-    assert json.loads(c.get_covenant("0xowner", "COV-001"))["title"] == "Safety review"
-
-def test_ids_duplicate_and_normalized(env):
-    c = opened(env)
-    with pytest.raises(UserError): c.create_covenant(" cov-001 ", "Safety review", TERMS)
-    with pytest.raises(UserError): c.open_checkpoint("cp-001", "COV-001", REPORT)
-
-def test_resubmit_after_challenge_blocked_history_retained(env):
-    c = evaluated(env)
-    env[2].message.sender_address = "0xchallenger"
-    agree(env[3], {"checks": ["SUPPORTED", "CONTRADICTED"], "reason": "Counter-evidence contradicts the mitigation requirement at index one."})
-    c.challenge_fulfillment("0xowner", "CP-001", "Section two explicitly says the critical finding remains unmitigated.")
-    r = json.loads(c.get_checkpoint("0xowner", "CP-001"))
-    assert r["outcome"] == "BREACH" and len(r["history"]) == 2
-    with pytest.raises(UserError): c.challenge_fulfillment("0xowner", "CP-001", EVIDENCE)
-    env[2].message.sender_address = "0xowner"
-    with pytest.raises(UserError): c.submit_fulfillment("CP-001", REPORT, EVIDENCE)
-    c.finalize_checkpoint("CP-001")
-    with pytest.raises(UserError): c.finalize_checkpoint("CP-001")
-
-def test_self_challenge_forbidden(env):
-    c = evaluated(env)
-    with pytest.raises(UserError): c.challenge_fulfillment("0xowner", "CP-001", EVIDENCE)
-
-def test_cancel_open_and_no_submit(env):
-    c = opened(env)
-    c.cancel_checkpoint("CP-001")
-    with pytest.raises(UserError): c.submit_fulfillment("CP-001", REPORT, EVIDENCE)
-
-@pytest.mark.parametrize("raw", ['{}','{"checks":["SUPPORTED"],"reason":"Enough length for a reason."}','{"checks":["SUPPORTED","UNKNOWN"],"reason":"Enough length for a reason."}'])
-def test_malformed_no_mutation(env, raw):
-    c = opened(env)
-    env[3].append(raw)
-    with pytest.raises((ValueError, UserError)): c.submit_fulfillment("CP-001", REPORT, EVIDENCE)
-    assert json.loads(c.get_checkpoint("0xowner", "CP-001"))["status"] == "OPEN"
-
-def test_same_band_different_obligations_rejected(env):
-    c = opened(env)
-    agree(env[3], {"checks": ["SUPPORTED","MISSING"],"reason":"First supported; second missing."}, {"checks":["MISSING","SUPPORTED"],"reason":"First missing; second supported."})
-    with pytest.raises(UserError, match="disagreement"): c.submit_fulfillment("CP-001", REPORT, EVIDENCE)
-
-def test_false_model_narrative_is_never_persisted(env):
-    c = opened(env)
-    agree(env[3], GOOD, {"checks":GOOD["checks"],"reason":"An external auditor independently authenticated all the real-world delivery."}, semantic="NO")
-    c.submit_fulfillment("CP-001", REPORT, EVIDENCE)
-    record = json.loads(c.get_checkpoint("0xowner", "CP-001"))
-    assert "external auditor" not in record["reason"]
-    assert "obligation 1 = SUPPORTED" in record["reason"]
-    assert "No independent verification" in record["reason"]
-
-def test_no_unbounded_or_duplicate_obligations(env):
-    with pytest.raises(UserError): env[1].create_covenant("COV-001", "Safety review", "\n".join(["same obligation " * 3]*2))
-    with pytest.raises(UserError): env[1].create_covenant("COV-002", "Safety review", "short")
+def env():return load_contract("covenant_loom.py","CovenantLoom")
+def opened(e):
+ c,g=e[1],e[2];c.create_covenant("COV-1","Safety delivery",TERMS,"0xcounterparty");c.open_checkpoint("CP-1","COV-1","Verify the published security report.",3600);return c
+def submitted(e):
+ c=opened(e);e[2].message.sender_address="0xcounterparty";web_agree(e[5],BODY);agree(e[3],GOOD);c.submit_fulfillment("0xowner","CP-1",URL);return c
+def test_counterparty_authenticated_fetched_evidence(env):
+ c=submitted(env);r=json.loads(c.get_checkpoint("0xowner","CP-1"));assert r["status"]=="CHALLENGE_WINDOW";assert r["source_digest"]==hashlib.sha256(BODY.encode()).hexdigest();assert r["history"][0]["actor"]=="0xcounterparty"
+def test_owner_cannot_submit_and_outsider_cannot_challenge(env):
+ c=opened(env)
+ with pytest.raises(UserError):c.submit_fulfillment("0xowner","CP-1",URL)
+ env[2].message.sender_address="0xcounterparty";web_agree(env[5],BODY);agree(env[3],GOOD);c.submit_fulfillment("0xowner","CP-1",URL)
+ env[2].message.sender_address="0xoutsider"
+ with pytest.raises(UserError):c.challenge_fulfillment("CP-1","A detailed challenge that identifies a missing mitigation in the report.")
+def test_immediate_finalize_blocked_and_permissionless_after_deadline(env):
+ c=submitted(env)
+ with pytest.raises(UserError,match="still open"):c.finalize_checkpoint("0xowner","CP-1")
+ k=c.key("0xowner","CP-1");r=json.loads(c.checkpoints[k]);r["challenge_deadline"]=0;c.checkpoints[k]=env[0].enc(r);env[2].message.sender_address="0xanyone";c.finalize_checkpoint("0xowner","CP-1");assert json.loads(c.get_checkpoint("0xowner","CP-1"))["status"]=="FINAL"
+def test_defined_owner_challenge_and_counterparty_rebuttal(env):
+ c=submitted(env);env[2].message.sender_address="0xowner";c.challenge_fulfillment("CP-1","The source does not demonstrate the deployment mitigation under production conditions.");env[2].message.sender_address="0xoutsider"
+ with pytest.raises(UserError):c.submit_rebuttal("0xowner","CP-1",URL)
+ env[2].message.sender_address="0xcounterparty";web_agree(env[5],BODY+" Production deployment logs included.");agree(env[3],GOOD);c.submit_rebuttal("0xowner","CP-1","https://evidence.example/rebuttal.txt");env[2].message.sender_address="0xanyone";c.finalize_checkpoint("0xowner","CP-1");assert json.loads(c.get_checkpoint("0xowner","CP-1"))["status"]=="FINAL"
+def test_bad_url_and_source_failure_leave_open(env):
+ c=opened(env);env[2].message.sender_address="0xcounterparty"
+ for u in ("http://evidence.example/a","https://user:pass@evidence.example/a#x"):
+  with pytest.raises(UserError):c.submit_fulfillment("0xowner","CP-1",u)
+ env[5].extend(["tiny"])
+ with pytest.raises(ValueError):c.submit_fulfillment("0xowner","CP-1",URL)
+ assert json.loads(c.get_checkpoint("0xowner","CP-1"))["status"]=="OPEN"
+def test_validator_source_or_finding_disagreement_rejected(env):
+ c=opened(env);env[2].message.sender_address="0xcounterparty";env[5].extend([BODY,BODY+" changed"]);agree(env[3],GOOD)
+ with pytest.raises(UserError,match="disagreement"):c.submit_fulfillment("0xowner","CP-1",URL)
+def test_snapshot_duplicate_and_window_bounds(env):
+ c=opened(env);c.revise_covenant("COV-1","A new obligation that is long enough for validation.");r=json.loads(c.get_checkpoint("0xowner","CP-1"));assert r["covenant_version"]==1 and r["obligations"]==TERMS.splitlines()
+ with pytest.raises(UserError):c.create_covenant("cov-1","Safety delivery",TERMS,"0xcounterparty")
+ with pytest.raises(UserError):c.open_checkpoint("CP-2","COV-1","Verify another published report.",60)
+def test_owner_counterparty_must_differ(env):
+ with pytest.raises(UserError):env[1].create_covenant("COV-1","Safety delivery",TERMS,"0xowner")
+def test_wrapped_json_is_accepted_but_extra_fields_fail(env):
+ assert env[0].norm('```json\n{"checks":["SUPPORTED","MISSING"]}\n```',2)["checks"][1]=="MISSING"
+ with pytest.raises(ValueError):env[0].norm('{"checks":["SUPPORTED","MISSING"],"reason":"unchecked"}',2)

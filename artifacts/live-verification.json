@@ -1,64 +1,85 @@
 {
-  "address": "0x07F1D460C7356dCB2f6A9849E922aF8Ede1898A0",
-  "reviewer": "0x8E4723ac141EBbf10Cd4994dC8d3E42977e7d978",
+  "address": "0xFe7512dc8Cf89057d2e49963D1dBC6405D81D945",
+  "owner": "0xeA1e8745D9Fc542c76878b48BA69C34037ddDF41",
+  "counterparty": "0xb7Dd696B818340091Ff3d18Ba9FC7CA8A7970bD7",
+  "observer": "0xb27377c7a7561D3cdE8Ee2345Ec115b9E69A1821",
   "events": [
     {
       "functionName": "create_covenant",
-      "hash": "0xe210456c4c4fdedb59dd2617583334687e58b74aaee5e1d1140dab29cd8b46ed"
+      "hash": "0x8518ef7ff857eb46cc600733d9c189afe88f6aaa54452f0879e8266f2c8bef8c"
     },
     {
       "functionName": "open_checkpoint",
-      "hash": "0x89166d7117fd93d473f388c12c65c35f470390d829aeda261f25a3a1b8ab21b4"
-    },
-    {
-      "functionName": "revise_covenant",
-      "hash": "0x2c5e3f7f3eafc30e0587199899de52a98e555f10de773e43da660fdee1ab9fb9"
+      "hash": "0x3aea6ba6e3d1059aedfc90b6cfa82104b42e55d7d5965f20ffc9b5b63fe2325f"
     },
     {
       "functionName": "submit_fulfillment",
-      "hash": "0x800fc5271315e53c01ea1286e187d9808ba322373dd7f58020ac5b16afe77b04"
+      "hash": "0x979e42f973fac08f1ede72cd8d8e027d3d7890b13d671d904469f308cbb0b6c9"
+    },
+    {
+      "functionName": "challenge_fulfillment",
+      "hash": "0xcb7f064879ca4ef67aebd8ce719b59470a3b29a7bf7713d8d9c1df49eba79900"
+    },
+    {
+      "functionName": "submit_rebuttal",
+      "hash": "0x921b6c7d571616594894b73ebb2890fd92beab0526609d673fb12b6f78f43d8b"
     },
     {
       "functionName": "finalize_checkpoint",
-      "hash": "0x560ae21ee0923738526147fb4aa92994af78020f836944b6d6cddd52f70ee001"
+      "hash": "0x041cd456946d1a271299ea385653b30f1189e6081394fd7ea0fc2b67b5268e3a"
     }
   ],
-  "assessed_record": {
+  "final_record": {
+    "challenge": "Clarify that the published source is bound to the designated counterparty and fetched by validators.",
+    "challenge_deadline": 1788658730,
+    "challenge_seconds": 3600,
     "checks": [
       "SUPPORTED"
     ],
-    "covenant_id": "SMOKE-COV",
+    "counterparty": "0xb7dd696b818340091ff3d18ba9fc7ca8a7970bd7",
+    "covenant_id": "LIVE-COV",
     "covenant_version": 1,
-    "deliverable": "Assess the supplied release documentation report.",
-    "evidence": "Delivery manifest excerpt: release.md contains release notes; changes.md contains the detailed change log.",
+    "deliverable": "Verify the project name in the counterparty-published repository document.",
     "history": [
       {
-        "author": "0x8e4723ac141ebbf10cd4994dc8d3e42977e7d978",
-        "packet": {
-          "deliverable": "Assess the supplied release documentation report.",
-          "evidence": "Delivery manifest excerpt: release.md contains release notes; changes.md contains the detailed change log.",
-          "obligations": [
-            "The report must list the names of two delivered files."
-          ],
-          "report": "The delivered package contains the following two files: release.md and changes.md."
-        },
-        "result": {
-          "checks": [
-            "SUPPORTED"
-          ],
-          "reason": "Text-only assessment: obligation 1 = SUPPORTED. No independent verification of delivery."
-        },
-        "round": 1
+        "action": "SUBMIT",
+        "actor": "0xb7dd696b818340091ff3d18ba9fc7ca8a7970bd7",
+        "checks": [
+          "SUPPORTED"
+        ],
+        "source_digest": "c09c2f66acb64401a1fdf81652e6fb62d487c92a74cd05fc12e306d92ec6d175",
+        "source_url": "https://raw.githubusercontent.com/rankoo21/CovenantLoom/master/README.md"
+      },
+      {
+        "action": "CHALLENGE",
+        "actor": "0xea1e8745d9fc542c76878b48ba69c34037dddf41",
+        "text": "Clarify that the published source is bound to the designated counterparty and fetched by validators."
+      },
+      {
+        "action": "REBUTTAL",
+        "actor": "0xb7dd696b818340091ff3d18ba9fc7ca8a7970bd7",
+        "checks": [
+          "SUPPORTED"
+        ],
+        "source_digest": "c09c2f66acb64401a1fdf81652e6fb62d487c92a74cd05fc12e306d92ec6d175",
+        "source_url": "https://raw.githubusercontent.com/rankoo21/CovenantLoom/master/README.md"
+      },
+      {
+        "action": "FINALIZE",
+        "actor": "0xb27377c7a7561d3cde8ee2345ec115b9e69a1821"
       }
     ],
-    "id": "SMOKE-CP",
+    "id": "LIVE-CP",
     "obligations": [
-      "The report must list the names of two delivered files."
+      "The published document must explicitly identify the project as Covenant Loom."
     ],
     "outcome": "SATISFIED",
-    "owner": "0x8e4723ac141ebbf10cd4994dc8d3e42977e7d978",
-    "reason": "Text-only assessment: obligation 1 = SUPPORTED. No independent verification of delivery.",
-    "report": "The delivered package contains the following two files: release.md and changes.md.",
-    "status": "EVALUATED"
+    "owner": "0xea1e8745d9fc542c76878b48ba69c34037dddf41",
+    "rebuttal_digest": "c09c2f66acb64401a1fdf81652e6fb62d487c92a74cd05fc12e306d92ec6d175",
+    "rebuttal_url": "https://raw.githubusercontent.com/rankoo21/CovenantLoom/master/README.md",
+    "source_digest": "c09c2f66acb64401a1fdf81652e6fb62d487c92a74cd05fc12e306d92ec6d175",
+    "source_url": "https://raw.githubusercontent.com/rankoo21/CovenantLoom/master/README.md",
+    "status": "FINAL",
+    "submitted_at": 1788655130
   }
 }

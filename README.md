@@ -1,35 +1,26 @@
-# Covenant Loom — v2
+# Covenant Loom v3
 
-Covenant Loom preserves creator-owned, versioned obligations and evaluates supplied delivery text against an immutable checkpoint snapshot. It is not escrow, legal arbitration or independent proof that delivery happened.
+Covenant Loom is a counterparty-bound evidence and dispute primitive for GenLayer. It does not accept an owner-authored delivery assertion as proof.
 
-## Reviewer path
-1. Connect any Studionet wallet, not necessarily the deployer.
-2. Create a covenant with a unique ID, title and 1–8 obligations (one per line).
-3. Open a checkpoint with its own ID and deliverable. This freezes the covenant version and obligations.
-4. Enter the report and supporting text; select the checkpoint and submit.
-5. Wait for finalization and read back the actual report, evidence, indexed findings and assessment history.
-6. A different wallet can look up the creator address/checkpoint ID and challenge once with counter-evidence before finalization.
-7. The creator may finalize an evaluated/challenged checkpoint, or cancel an open one.
+## Lifecycle
 
-Revising a covenant never alters an existing checkpoint. Original reports and first-round assessments remain in challenge history. Submissions, challenges and finalizations cannot be replayed. All IDs are scoped to their creator.
+1. The owner creates versioned obligations and names a separate counterparty wallet.
+2. Opening a checkpoint freezes the obligation version and a 1-hour to 7-day challenge duration.
+3. Only that counterparty can submit a clean public HTTPS evidence URL.
+4. Validators independently fetch the source, hash its exact bytes, and evaluate every indexed obligation. Only exact structured findings and the SHA-256 digest are stored.
+5. The owner cannot finalize during the challenge window. Only the owner can challenge, so an outsider cannot consume the dispute slot.
+6. Only the designated counterparty can answer with a fetched rebuttal source.
+7. Finalization is permissionless after an unchallenged deadline, or after rebuttal. History preserves actors, URLs, digests, and findings.
 
-## Consensus
-Each validator independently evaluates every canonical obligation in order. Indexed SUPPORTED/MISSING/CONTRADICTED findings must agree. Stored explanations and SATISFIED/PARTIAL/INSUFFICIENT/BREACH are derived deterministically from those findings. Model-authored prose is discarded, so it cannot add unvalidated claims of external verification.
+Source outages, malformed model output, different fetched bytes, or validator disagreement fail without changing checkpoint state. Text at public evidence URLs remains untrusted and can change later; the stored digest identifies the bytes actually assessed. This is not escrow, legal arbitration, or proof beyond the fetched source.
 
-## Limits
-Evidence is caller-supplied text, not authenticated external evidence. There is no enforced challenge delay: the creator can finalize before someone challenges. No funds, signatures certifying delivery or binding legal decision are implemented. All submitted text is public. Do not describe SATISFIED as independently proven real-world completion.
+## Verification
 
-## Source and verification
+- Contract: `contracts/covenant_loom.py`
+- Tests: 9 direct lifecycle and adversarial checks
+- GenVM lint: 3 checks passed
+- Live test: three wallets completed create, open, fetched submission, challenge, fetched rebuttal, and permissionless finalization
+- Deployment evidence: `artifacts/deployment.json` and `artifacts/live-verification.json`
+- App: https://covenant-loom-genlayer.pages.dev/
 
-- Complete contract: contracts/covenant_loom.py
-- Direct adversarial tests: tests/test_contract.py (mock nondeterministic execution; not a real validator network)
-- Deployment script: scripts/deploy.mjs
-- Published source hash and address: artifacts/deployment.json
-- Real-network lifecycle check: scripts/verify-live.mjs (creates a fresh unrelated test wallet; saves public evidence only)
-- Frontend methods and exact argument forwarding: app/page.tsx and lib/ledger.ts
-
-Run npm install, npx tsc --noEmit, npm run build, python -m pytest tests -q, and genvm-lint contracts/covenant_loom.py. Deployment requires GENLAYER_PRIVATE_KEY in the process environment; never commit it. Run node scripts/verify-live.mjs to test the current deployment. Local tests and source matching do not alone prove a complete production audit.
-
-## Hosting
-
-[Public application](https://covenant-loom-genlayer.pages.dev). Cloudflare Pages proxies the built application hosted on Cloudflare Workers. No ChatGPT sign-in is required. The old v1 deployment is superseded, not migrated; its records are not part of this v2 workspace.
+Run `python -m pytest tests -q`, `genvm-lint contracts/covenant_loom.py`, `npm run build`, and `node scripts/verify-live.mjs`.

@@ -19,10 +19,16 @@ class Return:
 class UserError(Exception):
     pass
 
+class WebResponse:
+    def __init__(self, body, status_code=200):
+        self.body = body.encode("utf-8")
+        self.status_code = status_code
+
 def load_contract(filename, classname):
     fake = types.ModuleType("genlayer")
     prompts = []
     responses = []
+    web_responses = []
     def prompt(text):
         prompts.append(text)
         if not responses:
@@ -34,12 +40,17 @@ def load_contract(filename, classname):
         if not validator(Return(value)):
             raise UserError("consensus disagreement")
         return value
+    def web_get(_url):
+        if not web_responses:
+            raise AssertionError("unexpected web call")
+        value = web_responses.pop(0)
+        return WebResponse(value) if isinstance(value, str) else value
     identity = lambda f: f
     fake.gl = types.SimpleNamespace(
         Contract=object, public=types.SimpleNamespace(write=identity, view=identity),
         message=types.SimpleNamespace(sender_address="0xowner"),
         vm=types.SimpleNamespace(Return=Return, UserError=UserError, run_nondet_unsafe=run),
-        nondet=types.SimpleNamespace(exec_prompt=prompt))
+        nondet=types.SimpleNamespace(exec_prompt=prompt, web=types.SimpleNamespace(get=web_get)))
     fake.TreeMap = Map
     fake.u256 = int
     fake.Address = str
@@ -55,7 +66,10 @@ def load_contract(filename, classname):
         if annotation is Map:
             setattr(contract, name, Map())
     contract.__init__()
-    return module, contract, fake.gl, responses, prompts
+    return module, contract, fake.gl, responses, prompts, web_responses
 
 def agree(queue, value, other=None, semantic="YES"):
     queue.extend([json.dumps(value), json.dumps(other or value)])
+
+def web_agree(queue, body):
+    queue.extend([body, body])
